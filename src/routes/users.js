@@ -13,4 +13,3 @@ router.get("/email/:email", getUserByEmail);
 router.get("/me", getMe);
 
 module.exports = router;
-

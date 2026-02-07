@@ -12,6 +12,16 @@ exports.getAnswersByQuestionId = async (req, res) => {
   }
 };
 
+exports.createAnswer = async (req, res) => {
+  try {
+    const answer = new Answer(req.body);
+    const newAnswer = await answer.save();
+    res.status(201).json(newAnswer);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
 exports.updateAnswerById = async (req, res) => {
   try {
     const updatedAnswer = await Answer.findByIdAndUpdate(
@@ -24,3 +34,13 @@ exports.updateAnswerById = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
+
+exports.deleteAnswerById = async (req, res) => {
+  try {
+    const deletedAnswer = await Answer.findByIdAndDelete(req.params.id);
+    res.json(deletedAnswer);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
