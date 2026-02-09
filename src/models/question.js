@@ -1,53 +1,86 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const StatSchema = new mongoose.Schema({
-    answers: {
-        type: Number,
-        default: 0
-    },
-    votes: {
-        type: Number,
-        default: 0
-    },
-    views: {
-        type: Number,
-        default: 0
-    },
-    timeAgo: {
-        type: Date,
-        default: Date.now
-    }
-})
-
-const questionSchema = new mongoose.Schema({
+const questionSchema = new mongoose.Schema(
+  {
     title: {
-        type: String,
-        required: true,
-        unique: true
+      type: String,
+      required: true,
+      trim: true,
+      index: true,
     },
-    subtitle: {
-        type: String,
-        required: false
-    },
-    category: {
-        type: String,
-        required: true,
-        enum: ['Science', 'Philosophy', 'Society']
-    },
-    hasAnswer: {
-        type: Boolean,
-        default: false
-    },
-    answerPreview: {
-        type: String,
-        required: false
-    },
-    createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    stats: StatSchema
-});
 
-module.exports = mongoose.model('Question', questionSchema);
+    description: {
+      type: String,
+      required: true,
+    },
+
+    category: {
+      type: String,
+      enum: ["Science", "Philosophy", "Society", "Technology"],
+      required: true,
+    },
+
+    tags: [
+      {
+        type: String,
+        lowercase: true,
+      },
+    ],
+
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
+    answersCount: {
+      type: Number,
+      default: 0,
+    },
+
+    views: {
+      type: Number,
+      default: 0,
+    },
+
+    votes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+
+    votesCount: {
+      type: Number,
+      default: 0,
+    },
+
+    hasAcceptedAnswer: {
+      type: Boolean,
+      default: false,
+    },
+
+    acceptedAnswer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Answer",
+      default: null,
+    },
+
+    isEdited: {
+      type: Boolean,
+      default: false,
+    },
+
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true },
+);
+
+// FULL TEXT SEARCH INDEX
+questionSchema.index({ title: "text", description: "text", tags: "text" });
+questionSchema.index({ isDeleted: 1, createdAt: -1 });
+
+module.exports = mongoose.model("Question", questionSchema);

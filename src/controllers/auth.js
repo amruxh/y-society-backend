@@ -2,6 +2,9 @@ const User = require("../models/user");
 const generateToken = require("../utils/generateToken");
 
 exports.register = async (req, res) => {
+  console.log("Calling")
+  console.log(req.body);
+  
   try {
     const { full_name, email, password } = req.body;
 
@@ -62,6 +65,40 @@ exports.login = async (req, res) => {
       },
     });
 
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.oauthLogin = async (req, res) => {
+  try {
+    const { email, name, image } = req.body;
+
+    // check user exists
+    let user = await User.findOne({ email });
+
+    // if not → create
+    if (!user) {
+      user = await User.create({
+        full_name: name,
+        email,
+        profile_pic: image,
+        password: Math.random().toString(36), // dummy password
+      });
+    }
+
+    // create backend JWT
+    const token = generateToken(user);
+
+    res.json({
+      message: "OAuth login successful",
+      token,
+      user: {
+        id: user._id,
+        full_name: user.full_name,
+        role: user.role,
+      },
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

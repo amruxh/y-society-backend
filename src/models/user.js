@@ -17,8 +17,18 @@ const UserSchema = new mongoose.Schema({
     minlength: 8,
     select: false,
   },
+  phone: {
+    type: String,
+    required: false,
+  },
   profile_pic: String,
   bio: String,
+  saved: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Question",
+    },
+  ],
   role: {
     type: String,
     enum: ["user", "admin"],
